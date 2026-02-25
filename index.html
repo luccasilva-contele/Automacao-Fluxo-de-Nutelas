@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Automação Nutela — N8N</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #0d0d0d;
+  color: #f0f0f0;
+  min-height: 100vh;
+  padding: 48px 24px 64px;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
+.sub {
+  font-size: 13px;
+  color: #555;
+}
+
+/* FLOW */
+.flow {
+  max-width: 480px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* TRIGGER */
+.trigger {
+  width: 100%;
+  background: #141414;
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
+  padding: 16px 20px;
+}
+
+.trigger-label {
+  font-size: 10px;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  margin-bottom: 8px;
+}
+
+.trigger-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 12px;
+}
+
+.trigger-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.trigger-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #1a1a1a;
+  border: 1px solid #222;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #888;
+}
+
+.trigger-field .icon { font-size: 14px; }
+
+/* ARROW */
+.arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 40px;
+}
+
+.arrow-line {
+  width: 1px;
+  flex: 1;
+  background: #2a2a2a;
+}
+
+.arrow-head {
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 7px solid #2a2a2a;
+}
+
+/* STEP NODE */
+.step {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid #222;
+  background: #141414;
+  overflow: hidden;
+  transition: border-color .2s;
+}
+
+.step:hover { border-color: #333; }
+
+.step-inner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+}
+
+.step-num {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: #1e1e1e;
+  border: 1px solid #2a2a2a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: #555;
+  flex-shrink: 0;
+}
+
+.step-body { flex: 1; }
+
+.step-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f0f0f0;
+  margin-bottom: 2px;
+}
+
+.step-desc {
+  font-size: 11px;
+  color: #555;
+  line-height: 1.5;
+}
+
+.step-tag {
+  font-size: 10px;
+  padding: 3px 9px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  font-weight: 500;
+  letter-spacing: .04em;
+}
+
+.tag-ia    { background: rgba(139,92,246,.15); color: #a78bfa; border: 1px solid rgba(139,92,246,.2); }
+.tag-auto  { background: rgba(34,197,94,.12);  color: #4ade80; border: 1px solid rgba(34,197,94,.2); }
+.tag-check { background: rgba(251,191,36,.12); color: #fbbf24; border: 1px solid rgba(251,191,36,.2); }
+
+/* OUTPUT */
+.output {
+  width: 100%;
+  border: 1px solid rgba(244,63,94,.25);
+  background: rgba(244,63,94,.06);
+  border-radius: 10px;
+  padding: 16px 20px;
+}
+
+.output-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #f43f5e;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.output-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.output-item {
+  font-size: 12px;
+  color: #666;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.output-item::before {
+  content: '';
+  width: 4px;
+  height: 4px;
+  background: #f43f5e;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* LEGEND */
+.legend {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 40px;
+  flex-wrap: wrap;
+}
+
+.leg {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #555;
+}
+
+.leg-dot { width: 8px; height: 8px; border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎬 Automação Nutela</h1>
+  <p class="sub">Zero trabalho manual após o input inicial</p>
+</header>
+
+<div class="flow">
+
+  <!-- TRIGGER -->
+  <div class="trigger">
+    <div class="trigger-label">⚡ Trigger — Único input manual</div>
+    <div class="trigger-title">Início do Fluxo</div>
+    <div class="trigger-fields">
+      <div class="trigger-field"><span class="icon">🔗</span> Link da Live no YouTube</div>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <!-- 1 -->
+  <div class="step">
+    <div class="step-inner">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">Extrair Transcrição</div>
+        <div class="step-desc">Transcrição extraída via YouTube API com timestamps de todo o conteúdo da live.</div>
+      </div>
+      <span class="step-tag tag-auto">YouTube API</span>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <!-- 2 -->
+  <div class="step">
+    <div class="step-inner">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">IA Define as Minutagens</div>
+        <div class="step-desc">IA analisa a transcrição, identifica os pontos-chave e define as minutagens de início e fim de cada corte.</div>
+      </div>
+      <span class="step-tag tag-ia">IA</span>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <!-- 3 -->
+  <div class="step">
+    <div class="step-inner">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">Criar Task no Asana</div>
+        <div class="step-desc">Uma task é criada no Asana para cada corte identificado pela IA.</div>
+      </div>
+      <span class="step-tag tag-auto">Asana API</span>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <!-- 4 -->
+  <div class="step">
+    <div class="step-inner">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <div class="step-title">Edição do Vídeo por IA</div>
+        <div class="step-desc">IA corta o vídeo nas minutagens definidas, insere intro, finalização, logo e tarjas. Renderiza o arquivo final.</div>
+      </div>
+      <span class="step-tag tag-ia">IA</span>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <!-- 5 -->
+  <div class="step">
+    <div class="step-inner">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <div class="step-title">Definir Título SEO + Criativo</div>
+        <div class="step-desc">IA gera 2 opções de título com base na transcrição do corte.</div>
+      </div>
+      <span class="step-tag tag-ia">IA</span>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <!-- 6 -->
+  <div class="step">
+    <div class="step-inner">
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <div class="step-title">Criar Legenda + Trackear Links</div>
+        <div class="step-desc">IA escreve a descrição completa e os links são encurtados e trackeados com UTM via Bitly.</div>
+      </div>
+      <span class="step-tag tag-ia">IA</span>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <!-- 7 -->
+  <div class="step">
+    <div class="step-inner">
+      <div class="step-num">7</div>
+      <div class="step-body">
+        <div class="step-title">Criar Thumbnail</div>
+        <div class="step-desc">Thumbnail gerada automaticamente com o template do canal via Bannerbear.</div>
+      </div>
+      <span class="step-tag tag-ia">IA</span>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <!-- 8 -->
+  <div class="step" style="border-color: rgba(251,191,36,.25); background: rgba(251,191,36,.04)">
+    <div class="step-inner">
+      <div class="step-num">8</div>
+      <div class="step-body">
+        <div class="step-title">Validação da Thumbnail</div>
+        <div class="step-desc">Thumbnail enviada no Slack para aprovação. O fluxo aguarda o OK antes de publicar.</div>
+      </div>
+      <span class="step-tag tag-check">Aprovação</span>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <!-- 9 -->
+  <div class="step">
+    <div class="step-inner">
+      <div class="step-num">9</div>
+      <div class="step-body">
+        <div class="step-title">Publicar no YouTube</div>
+        <div class="step-desc">Vídeo, título, legenda e thumbnail publicados via YouTube API na data agendada.</div>
+      </div>
+      <span class="step-tag tag-auto">YouTube API</span>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <!-- 10 -->
+  <div class="step">
+    <div class="step-inner">
+      <div class="step-num">10</div>
+      <div class="step-body">
+        <div class="step-title">Registrar e Notificar</div>
+        <div class="step-desc">Link do vídeo salvo na planilha, Asana atualizado para "Concluído" e notificação enviada no Slack.</div>
+      </div>
+      <span class="step-tag tag-auto">Automático</span>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <!-- OUTPUT -->
+  <div class="output">
+    <div class="output-title">🎯 Nutela publicada</div>
+    <div class="output-list">
+      <div class="output-item">Vídeo no YouTube agendado</div>
+      <div class="output-item">Task no Asana concluída</div>
+      <div class="output-item">Registro na planilha</div>
+      <div class="output-item">Links trackeados ativos</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="legend">
+  <div class="leg"><div class="leg-dot" style="background:#4ade80"></div> Automático</div>
+  <div class="leg"><div class="leg-dot" style="background:#a78bfa"></div> Processado por IA</div>
+  <div class="leg"><div class="leg-dot" style="background:#fbbf24"></div> Único ponto de aprovação</div>
+</div>
+
+</body>
+</html>
